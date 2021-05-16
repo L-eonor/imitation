@@ -24,7 +24,8 @@ from stable_baselines3.common.policies import ActorCriticPolicy, BasePolicy
 from stable_baselines3.common.vec_env import DummyVecEnv, SubprocVecEnv, VecEnv
 
 from imitation.data import wrappers
-
+import gym, robo_gym
+from robo_gym.wrappers.exception_handling import ExceptionHandling
 
 def make_unique_timestamp() -> str:
     """Timestamp, with random uuid added to avoid collisions."""
@@ -64,7 +65,7 @@ def make_vec_env(
     """
     # Resolve the spec outside of the subprocess first, so that it is available to
     # subprocesses running `make_env` via automatic pickling.
-    spec = gym.spec(env_name)
+    #spec = gym.spec(env_name)
 
     def make_env(i, this_seed):
         # Previously, we directly called `gym.make(env_name)`, but running
@@ -75,7 +76,13 @@ def make_vec_env(
         # registering the custom environment in the scope of `make_vec_env` didn't
         # work. For more discussion and hypotheses on this issue see PR #160:
         # https://github.com/HumanCompatibleAI/imitation/pull/160.
-        env = spec.make()
+
+        #env = spec.make()
+        target_machine_ip = '127.0.0.1'
+        # for a simulated robot environment
+        env = gym.make('PickAndPlaceUR5Sim-v0', ip=target_machine_ip, gui=False)
+        env = ExceptionHandling(env)
+
 
         # Seed each environment with a different, non-sequential seed for diversity
         # (even if caller is passing us sequentially-assigned base seeds). int() is
