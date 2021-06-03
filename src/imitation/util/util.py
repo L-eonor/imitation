@@ -80,7 +80,7 @@ def make_vec_env(
         #env = spec.make()
         target_machine_ip = '127.0.0.1'
         # for a simulated robot environment
-        env = gym.make('PickAndPlaceUR5Sim-v0', ip=target_machine_ip, gui=False)
+        env = gym.make(env_name, ip=target_machine_ip, gui=False)
         env = ExceptionHandling(env)
 
 

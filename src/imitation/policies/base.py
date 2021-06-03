@@ -71,3 +71,11 @@ class FeedForward256Policy(policies.ActorCriticPolicy):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs, net_arch=[256, 256])
+
+
+class FeedForward64Policy(policies.ActorCriticPolicy):
+    """A feed forward policy network with two hidden layers of 64 units.
+    """
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs, net_arch=[64, 64])

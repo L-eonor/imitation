@@ -117,8 +117,8 @@ ANT_SHARED_LOCALS = dict(
 
 @train_ex.named_config
 def pick_and_place():
-    env_name = "PickAndPlaceUR5Sim-v0"
-    rollout_hint = "/home/leonor/Desktop/expert_trajectories/pick_and_place"
+    env_name = "GripperReachOpenUR5Sim-v0"
+    rollout_hint = "/home/leonor/Desktop/HIRL_dissertation/hierarchical/trajectories/reach_cube_open"
     total_timesteps = 204800#n*2048  # Num of environment transitions to sample
     algorithm = "gail"  # Either "airl" or "gail"
 
@@ -130,12 +130,12 @@ def pick_and_place():
 
     # Use SubprocVecEnv rather than DummyVecEnv (generally faster if num_vec>1)
     parallel = True
-    max_episode_steps = 1000  # Set to positive int to limit episode horizons
+    max_episode_steps = 500  # Set to positive int to limit episode horizons
     
     # Kwargs for initializing GAIL and AIRL
     algorithm_kwargs = dict(
         shared=dict(
-            expert_batch_size=96,  # Number of expert samples per discriminator update
+            expert_batch_size=60,#46,#96,  # Number of expert samples per discriminator update
             # Number of discriminator updates after each round of generator updates
             n_disc_updates_per_round=4,
         ),
@@ -152,7 +152,7 @@ def pick_and_place():
         #policy= 'MlpPolicy',
         batch_size= 256,
         gae_lambda= 0.95, #discriminator reward weightδGAILis set to0.1
-        gamma= 1-1/1000, #1-1/H
+        #gamma= 1-1/1000, #1-1/H
         n_epochs= 200,
         ent_coef= 0.0,
         learning_rate= 0.001,
@@ -166,6 +166,63 @@ def pick_and_place():
     init_tensorboard = False  # If True, then write Tensorboard logs
     data_dir = "data/"  # Default data directory
 
+@train_ex.named_config
+def reach():
+    env_name = "GripperReachUR5Sim-v0"
+    rollout_hint = "/home/leonor/Desktop/HIRL_dissertation/hierarchical/trajectories/reach_cube"
+    total_timesteps = 204800#n*2048  # Num of environment transitions to sample
+    algorithm = "gail"  # Either "airl" or "gail"
+
+    n_expert_demos = 10#None  # Num demos used. None uses every demo possible
+    n_episodes_eval = 10#50  # Num of episodes for final mean ground truth return
+
+    # Number of environments in VecEnv, must evenly divide gen_batch_size
+    num_vec = 1
+
+    # Use SubprocVecEnv rather than DummyVecEnv (generally faster if num_vec>1)
+    parallel = True
+    max_episode_steps = 500  # Set to positive int to limit episode horizons
+    
+    # Kwargs for initializing GAIL and AIRL
+    algorithm_kwargs = dict(
+        shared=dict(
+            expert_batch_size=60,#46,#96,  # Number of expert samples per discriminator update
+            # Number of discriminator updates after each round of generator updates
+            n_disc_updates_per_round=3,
+        ),
+        airl={},
+        gail={},
+    )
+    # Kwargs for initializing {GAIL,AIRL}DiscrimNet
+    discrim_net_kwargs = dict(
+        shared={}, 
+        airl={}, 
+        gail=dict(
+            discriminator_hid_sizes=(100, 100),
+        )
+    )
+
+    # Modifies the __init__ arguments for the imitation policy
+    gen_batch_size = 128  # Batch size for generator updates
+    init_rl_kwargs = dict(
+        policy_class=base.FeedForward64Policy, #two hidden layers of size 64 
+        #normalize= True,
+        #policy= 'MlpPolicy',
+        batch_size= 128,
+        gae_lambda= 0.95, #discriminator reward weightδGAILis set to0.1
+        #gamma= 1-1/1000, #1-1/H
+        n_epochs= 200,
+        ent_coef= 0.0,
+        learning_rate= 0.001,
+        clip_range= 0.
+    )
+
+    
+    
+    log_root = os.path.join("output", "train_adversarial")  # output directory
+    checkpoint_interval = 5  # Num epochs between checkpoints (<0 disables)
+    init_tensorboard = False  # If True, then write Tensorboard logs
+    data_dir = "data/"  # Default data directory
 
 @train_ex.named_config
 def acrobot():
