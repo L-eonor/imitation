@@ -461,12 +461,17 @@ class GAIL(AdversarialTrainer):
             discrim = discrim_nets.DiscrimNetGAIL(
                 venv.observation_space, venv.action_space, discrim_net=discrim_net
             )
-            #discrim=th.load('/home/leonor/Desktop/HIRL_dissertation/hierarchical/output/train_adversarial/GripperReachOpenUR5Sim-v0/20210529_163416_e39a59_servidor_100_demos/checkpoints/final/discrim.pt', map_location=th.device('cpu'))
         else:
             discrim_kwargs = discrim_kwargs or {}
             discrim = discrim_nets.DiscrimNetGAIL(
                 venv.observation_space, venv.action_space, **discrim_kwargs
             )
+        
+        #discrim=th.load('/home/digi2/leonor/HIRL_dissertation/hierarchical/output/train_adversarial/GripperReachRetrainUR5Sim-v0/20210810_160207_33c3e3/checkpoints/00050/discrim.pt')
+        #discrim=th.load('/home/digi2/leonor/HIRL_dissertation/hierarchical/output/train_adversarial/GripperPickRetrainUR5Sim-v0/20210812_000336_373d8e/checkpoints/00055/discrim.pt')     
+        #discrim=th.load('/home/digi2/leonor/HIRL_dissertation/hierarchical/output/train_adversarial/GripperMoveRetrainUR5Sim-v0/20210826_174516_e1e197/checkpoints/00090/discrim.pt')
+        #discrim=th.load('/home/digi2/leonor/HIRL_dissertation/hierarchical/output/train_adversarial/GripperFitUR5Sim_v3-v0/20210911_232657_3657f7/checkpoints/00175/discrim.pt')
+        
         super().__init__(
             venv, gen_algo, discrim, expert_data, expert_batch_size, **kwargs
         )
